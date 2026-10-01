@@ -1,22 +1,22 @@
 # Java 3 — RideShare: kartat dhe faqet
 
-## Prova 1
+## Prova 1 — Lista në telefon
 
-Hapat: hapa faqen kryesore në `http://localhost:3000` dhe e kontrollova në pamjen e telefonit me gjerësi 375 px.
+**Hapat:** Hapa faqen kryesore në `http://localhost:3000` dhe e kontrollova në pamjen e telefonit me gjerësi 375 px.
 
-Rezultati real: shfaqen saktësisht tri karta udhëtimi, lidhjet janë të prekshme dhe nuk ka lëvizje horizontale.
+**Rezultati:** U shfaqën saktësisht tri karta udhëtimi, lidhjet ishin të prekshme dhe nuk pati lëvizje horizontale.
 
-## Prova 2
+## Prova 2 — Detajet dhe kufijtë
 
-Hapat: klikova kartën e dytë, pastaj hapa kartën e tretë dhe adresën `/udhetimi/99`.
+**Hapat:** Klikova kartën e dytë, pastaj hapa kartën e tretë dhe adresën `/udhetimi/99`.
 
-Rezultati real: `/udhetimi/2` shfaq vendtakimin “Te stacioni kryesor”; karta e tretë shfaq butonin e çaktivizuar “Nuk ka vende të lira”, ndërsa `/udhetimi/99` shfaq “Udhëtimi nuk u gjet”.
+**Rezultati:** `/udhetimi/2` shfaqi vendtakimin “Te stacioni kryesor”; karta e tretë shfaqi butonin e çaktivizuar “Nuk ka vende të lira”, ndërsa `/udhetimi/99` shfaqi “Udhëtimi nuk u gjet”.
 
-## Prova 3
+## Prova 3 — Kërkesa dhe kthimi
 
-Hapat: nga detajet e udhëtimit të dytë klikova “Kërko vend”, pastaj përdora lidhjet e kthimit.
+**Hapat:** Nga detajet e udhëtimit të dytë klikova “Kërko vend”, pastaj përdora lidhjet e kthimit.
 
-Rezultati real: hapet mesazhi “Simulim: Në pritje”, dhe lidhjet kthejnë te detajet ose te lista pa bërë rezervim real.
+**Rezultati:** U hap mesazhi “Simulim: Në pritje”, dhe lidhjet u kthyen te detajet ose te lista pa bërë rezervim real.
 
 ## Çfarë nuk punon ende
 
