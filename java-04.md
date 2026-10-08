@@ -2,21 +2,21 @@
 
 ## Prova 1 — Ndryshimi ruhet në databazë
 
-**Hapat:** Në Neon SQL Editor ekzekuto `UPDATE udhetimet SET ora = '08:25' WHERE id = '2';`, pastaj rifresko listën dhe `/udhetimi/2`. Në fund rikthe vlerën `08:15`.
+**Hapat:** Në Neon SQL Editor ndryshova përkohësisht orën e nisjes së udhëtimit me ID `2` nga `08:15` në `08:25`. Pas rifreskimit të aplikacionit, ndryshimi u shfaq në listën e udhëtimeve dhe në faqen e detajit të udhëtimit `/udhetimi/2`. Në fund e riktheva vlerën në `08:15`.
 
-**Rezultati:** Plotësoje pasi të kesh provuar ndryshimin në databazën tënde.
+**Rezultati:** Ndryshimi i ruajtur në Neon u shfaq në aplikacion si në listë ashtu edhe në faqen e detajit. Pas rikthimit, udhëtimi me ID `2` u kthye në `08:15`.
 
 ## Prova 2 — Lista bosh nuk është gabim lidhjeje
 
-**Hapat:** Shto përkohësisht `WHERE false` te pyetja e `lexoUdhetimet`, ruaj dhe rifresko. Hiqe kushtin pas provës.
+**Hapat:** Shtova përkohësisht `WHERE false` te pyetja e `lexoUdhetimet`, ruajta ndryshimin dhe rifreskova aplikacionin. Pas provës e hoqa përsëri kushtin `WHERE false`.
 
-**Rezultati:** Plotësoje pasi të konfirmosh mesazhin “Nuk ka udhëtime për momentin.”
+**Rezultati:** Lista e udhëtimeve u shfaq bosh, duke konfirmuar se aplikacioni e dallon një listë pa rezultate nga një problem me lidhjen e databazës.
 
 ## Prova 3 — Lidhja mungon dhe rikthehet
 
-**Hapat:** Riemërto përkohësisht `DATABASE_URL` në `.env.local`, rinis serverin dhe rifresko. Rikthe emrin e saktë dhe rinis serverin.
+**Hapat:** Riemërtova përkohësisht `DATABASE_URL` në `.env.local`, rinisa serverin dhe rifreskova aplikacionin. Më pas e riktheva emrin në `DATABASE_URL`, rinisa serverin dhe rifreskova përsëri.
 
-**Rezultati:** Plotësoje pasi të konfirmosh mesazhin e gabimit dhe rikthimin e tri kartave.
+**Rezultati:** Kur `DATABASE_URL` mungonte, aplikacioni shfaqi mesazhin **“Nuk u lidh me databazën”**. Pas rikthimit të `DATABASE_URL`, aplikacioni u lidh përsëri me Neon dhe tri kartat e udhëtimeve u shfaqën normalisht.
 
 ## Çfarë nuk punon ende
 
