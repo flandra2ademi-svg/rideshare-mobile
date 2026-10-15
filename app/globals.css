@@ -68,6 +68,10 @@ p { line-height: 1.55; }
 .status-card { margin-top: 10vh; padding: 28px; text-align: center; }
 .status-card p { color: var(--muted); }
 .status-card .eyebrow { color: #9fb4ff; }
+.time-form { display: grid; gap: 12px; margin: 20px 0; }
+.time-form input[type="time"] { min-height: 44px; padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--text); font: inherit; color-scheme: dark; }
+.time-form .action { margin-top: 0; }
+.time-form input:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .status-icon { margin-bottom: 14px; color: #a9bdff !important; font-size: 3rem; line-height: 1; }
 
 @media (min-width: 600px) {

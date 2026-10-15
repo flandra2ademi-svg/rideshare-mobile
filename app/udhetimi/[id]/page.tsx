@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { gjejUdhetimin } from "@/lib/udhetimet";
+import { merrProfilin } from "@/lib/profilet";
+import { FormaNdryshoOren } from "@/components/FormaNdryshoOren";
+import { mundTeNdryshoje } from "@/lib/lejet";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +26,10 @@ export default async function Detajet({ params }: { params: Promise<{ id: string
 
   if (!udhetim) notFound();
 
+  // A profile lookup failure must not prevent public trip details from loading.
+  const profili = await merrProfilin().catch(() => null);
+  const lejohet = mundTeNdryshoje(profili, udhetim);
+
   return (
     <main>
       <Link className="back-link" href="/">← Kthehu te lista</Link>
@@ -33,6 +40,12 @@ export default async function Detajet({ params }: { params: Promise<{ id: string
         <p><strong>Vendtakimi</strong><span>{udhetim.vendtakimi}</span></p>
         <p><strong>Vende të lira</strong><span>{udhetim.vende}</span></p>
       </section>
+      {lejohet && (
+        <section aria-label="Ndrysho orën">
+          <h2>Ndrysho orën e udhëtimit tim</h2>
+          <FormaNdryshoOren id={id} ora={udhetim.ora} />
+        </section>
+      )}
       {udhetim.vende > 0 ? (
         <Link className="action action--wide" href={`/udhetimi/${id}/kerkesa`}>Kërko vend</Link>
       ) : (

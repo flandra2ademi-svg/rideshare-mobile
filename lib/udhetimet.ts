@@ -8,12 +8,13 @@ export type Udhetim = {
   ora: string;
   vendtakimi: string;
   vende: number;
+  shofer_id: string | null;
 };
 
 export async function lexoUdhetimet(): Promise<Udhetim[]> {
   const sql = getSql();
   const rows = await sql`
-    SELECT id, nisja, destinacioni, ora, vendtakimi, vende
+    SELECT id, nisja, destinacioni, ora, vendtakimi, vende, shofer_id
     FROM udhetimet
     ORDER BY id
   `;
@@ -26,7 +27,7 @@ export async function gjejUdhetimin(
 ): Promise<Udhetim | undefined> {
   const sql = getSql();
   const rows = await sql`
-    SELECT id, nisja, destinacioni, ora, vendtakimi, vende
+    SELECT id, nisja, destinacioni, ora, vendtakimi, vende, shofer_id
     FROM udhetimet
     WHERE id = ${id}
   `;
