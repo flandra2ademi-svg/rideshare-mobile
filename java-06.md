@@ -6,17 +6,19 @@ U shtuan manifesti me emrin RideShare AAB dhe ikonat 192×192/512×512, një API
 
 ## Provat që bëra
 
+Këto prova u kryen manualisht nga përdoruesja në Chrome.
+
 ### Prova 1: Manifesti dhe vizita online
 
-NOT RUN manualisht në shfletues në këtë sesion. Duhet të hapen `/manifest.webmanifest`, `/icons/icon-192.png` dhe `/icons/icon-512.png`, të kontrollohet worker-i aktiv dhe ruajtja e `/api/udhetimet`.
+Përdoruesja konfirmoi se service worker-i `/sw.js` ishte i regjistruar dhe aktivizuar. Nuk po shënohen kontrolle të tjera të manifestit si të verifikuara, sepse nuk u raportuan rezultate të veçanta për to.
 
 ### Prova 2: Pa internet dhe pas rifreskimit
 
-NOT RUN manualisht. Prova kërkon DevTools → Network → Offline vetëm në tab-in RideShare, rifreskim të `/` ose hapje të `/offline.html`, dhe verifikim të tri kartave, kohës së kopjes dhe mesazhit që nuk konfirmon rezervim.
+Me Offline të aktivizuar dhe pas rifreskimit normal, u hap faqja fallback me tri udhëtimet e ruajtura, kohën e kopjes dhe njoftimin se nuk konfirmohen rezervime.
 
 ### Prova 3: Lidhja rikthehet
 
-NOT RUN manualisht. Prova kërkon ndryshimin e përkohshëm të ID 2 nga `08:15` në `08:25` në Neon, kontrollin e kopjes së vjetër offline, rikthimin online dhe klikimin e “Rifresko listën”. Ora duhet të bëhet `08:25` nga serveri dhe pastaj të rikthehet në `08:15`.
+Pas çaktivizimit të Offline dhe klikimit “Rifresko listën”, faqja shfaqi “Lista erdhi nga serveri” dhe koha e kopjes u përditësua. Në Neon, përdoruesja ndryshoi orën e udhëtimit me id `2` nga `08:15` në `08:25`; pas rifreskimit faqja shfaqi `08:25`. Ora u rikthye në Neon në `08:15` dhe pas rifreskimit u konfirmua edhe në faqe.
 
 ## Ku gjendet puna
 
@@ -30,4 +32,4 @@ Vizita e parë pa internet nuk ka kopje për të lexuar dhe shfaq mesazh ndihmë
 
 ## Ndihma nga AI (Artificial Intelligence – inteligjencë artificiale)
 
-Codex ndihmoi në leximin e kërkesave, implementimin e PWA-së dhe kontrollet statike. Provat manuale të shfletuesit mbeten `NOT RUN` dhe duhet të kryhen realisht para dorëzimit.
+Codex ndihmoi në leximin e kërkesave, implementimin e PWA-së dhe kontrollet statike. Provat manuale të mësipërme u kryen dhe u konfirmuan nga përdoruesja në Chrome. Nuk po paraqiten si të verifikuara kontrolle të tjera që nuk u raportuan.
