@@ -5,11 +5,10 @@
 - GitHub: `flandra2ademi-svg`
 - Kodi: `P7-691`
 - Skenari paraprak: `Rasti 1 · Lista dhe detajet`
-- ID e propozuar: `2` — duhet të verifikohet në aplikacion dhe databazë
-- Nisja: Ferizaj
-- Destinacioni: AAB
-- Ora fillestare: `09:05`
-- Vende fillestare: `2`
+- ID e verifikuar: `2` — në aplikacion dhe në Neon
+- Të dhënat e përkohshme për provë: Ferizaj → AAB
+- Ora e përdorur në provë: `09:05`
+- Vende të përdorura në provë: `2`, pastaj `1`
 - Ora e re për provë: `09:10`
 
 ## Parashikimi para kontrollit
@@ -20,13 +19,16 @@ Parashikoj që udhëtimi me ID 2 të shfaqë të njëjtat të dhëna në listë 
 
 Gjendja fillestare u ruajt para çdo ndryshimi teknik. Branch-i është `main`, remote-i është `https://github.com/flandra2ademi-svg/rideshare-mobile.git`, dhe ndryshime të palidhura në `detyrapm/` dhe `skica.png` nuk u prekën.
 
-## Problemet ose paqartësitë e vëzhguara
+## Dy problemet ose paqartësitë e vëzhguara
 
-Rrjedha e kërkesës për vend shfaqet si simulim: kërkesa mbetet në pritje dhe aplikacioni njofton se nuk i është dërguar shoferit. Për ndryshimin e orës në `09:10` u verifikua faqja e detajeve, por nuk u konfirmua shfaqja e kësaj ore në listë.
+- E vëzhguar para korrigjimit: lista shfaqte “1 vende të lira”.
+- Paqartësi nga inspektimi i kodit: `schema.sql` nuk krijon kolonën `shofer_id`, ndërsa `schema-java05.sql` e shton. Skedarët u verifikuan; kjo paqartësi nuk u riprodhua me instalim të freskët.
 
-## Korrigjimi i zgjedhur
+## Korrigjimi
 
-U përdorën të dhëna të përkohshme për të provuar rrjedhën e kërkesës dhe ndryshimin e vetëm të orës. Pas provave, të dhënat e ID-së `2` u rikthyen në vlerat origjinale. Sugjerimi i kodit dhe mënyra e verifikimit u hartuan me ndihmën e AI-së; rezultatet më poshtë janë vetëm ato të kryera realisht.
+- Skedari: `components/KartaUdhetimi.tsx`
+- Ndryshimi real: për `vende === 1` shfaqet “1 vend i lirë”; për numra më të mëdhenj ruhet shumësi “vende të lira”; për `0` ruhet “E plotë”.
+- Ndryshimet e përkohshme në Neon u përdorën vetëm për përgatitjen e provave dhe nuk janë korrigjimi i kodit.
 
 ## Provat
 
@@ -48,13 +50,10 @@ U përdorën të dhëna të përkohshme për të provuar rrjedhën e kërkesës 
 - Pritshmëria: Ora e ndryshuar të shihet në detaje dhe të dhënat origjinale të rikthehen pas provës.
 - Vëzhgimi: `09:10` u konfirmua te `/udhetimi/2`. Nuk kam konfirmim për shfaqjen e `09:10` në listë, prandaj kjo nuk deklarohet si e verifikuar. Rikthimi në `Prishtine → AAB`, `08:15`, “Te stacioni kryesor”, `1 vend` u verifikua me `SELECT` në Neon dhe në listën e aplikacionit.
 
-## Para:
+## Versionet
 
-Gjendja Para ruhet në lidhjen ekzistuese të këtij raporti.
-
-## Pas:
-
-Gjendja Pas ruhet në lidhjen ekzistuese të këtij raporti.
+- Para: https://github.com/flandra2ademi-svg/rideshare-mobile/commit/bb8546dc700ea6ff13c32ba7552d938ae74dee7f
+- Pas: https://github.com/flandra2ademi-svg/rideshare-mobile/commit/5f380436154b63d89b871b24bc8b63dc0c1f6c93
 
 ## Verifikimi teknik
 
