@@ -7,7 +7,11 @@ export function KartaUdhetimi({ udhetim }: { udhetim: Udhetim }) {
       <div className="trip-card__topline">
         <span className="time">{udhetim.ora}</span>
         <span className={udhetim.vende > 0 ? "availability" : "availability availability--full"}>
-          {udhetim.vende > 0 ? `${udhetim.vende} vende të lira` : "E plotë"}
+          {udhetim.vende === 1
+  ? "1 vend i lirë"
+  : udhetim.vende > 0
+    ? `${udhetim.vende} vende të lira`
+    : "E plotë"}
         </span>
       </div>
       <h2>{udhetim.nisja} <span aria-hidden="true">→</span> {udhetim.destinacioni}</h2>
