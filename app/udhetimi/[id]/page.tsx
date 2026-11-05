@@ -4,6 +4,7 @@ import { gjejUdhetimin } from "@/lib/udhetimet";
 import { merrProfilin } from "@/lib/profilet";
 import { FormaNdryshoOren } from "@/components/FormaNdryshoOren";
 import { mundTeNdryshoje } from "@/lib/lejet";
+import { Vendtakimi } from "@/components/Vendtakimi";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,7 @@ export default async function Detajet({ params }: { params: Promise<{ id: string
         <p><strong>Vendtakimi</strong><span>{udhetim.vendtakimi}</span></p>
         <p><strong>Vende të lira</strong><span>{udhetim.vende}</span></p>
       </section>
+      <Vendtakimi />
       {lejohet && (
         <section aria-label="Ndrysho orën">
           <h2>Ndrysho orën e udhëtimit tim</h2>

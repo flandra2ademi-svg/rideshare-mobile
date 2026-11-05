@@ -73,6 +73,18 @@ p { line-height: 1.55; }
 .time-form .action { margin-top: 0; }
 .time-form input:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .status-icon { margin-bottom: 14px; color: #a9bdff !important; font-size: 3rem; line-height: 1; }
+.meeting-point { display: grid; gap: 10px; margin: 28px 0; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.meeting-point h2 { margin-bottom: 2px; }
+.meeting-point label { color: var(--muted); font-weight: 700; }
+.meeting-point input { min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--background); color: var(--text); font: inherit; }
+.meeting-point input:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.meeting-point .action { margin-top: 2px; }
+.action--secondary { background: #315178; }
+.action--secondary:hover { background: #486d9d; }
+.meeting-error { min-height: 1.55em; margin: 0; color: #ffc2cf; }
+.confirmed-meeting { min-height: 1.55em; margin: 0; color: #a7f1d9; font-weight: 700; }
+.location-status { min-height: 1.55em; margin: 0; color: var(--muted); }
+.location-accuracy { min-height: 1.55em; margin: 0; color: #dce5ff; }
 
 @media (min-width: 600px) {
   main { padding: 56px 32px; }
