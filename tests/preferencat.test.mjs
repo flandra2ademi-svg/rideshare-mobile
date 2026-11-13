@@ -66,7 +66,9 @@ test('persistence returns one saved row for repeated idempotent requests', async
   const queries = [];
   const sql = async (strings, ...values) => {
     queries.push({ text: strings.join('?'), values });
-    return [{ udhetimi_ekziston: true, ruajtur: true, numer: 1 }];
+    if (queries.length === 1) return [{ id: '2' }];
+    if (queries.length === 2) return [];
+    return [{ ruajtur: true, numer: 1 }];
   };
   const first = await ruajPreferencen('2', '123', sql);
   const second = await ruajPreferencen('2', '123', sql);
@@ -74,9 +76,25 @@ test('persistence returns one saved row for repeated idempotent requests', async
   assert.equal(first.numer, 1);
   assert.equal(second.ruajtur, true);
   assert.equal(second.numer, 1);
-  assert.equal(queries.length, 2);
-  assert.match(queries[0].text, /ON CONFLICT \(perdoruesi_id, udhetimi_id\) DO NOTHING/);
-  assert.deepEqual(queries[0].values, ['2', '123', '123', '2', '2']);
+  assert.equal(queries.length, 6);
+  assert.match(queries[1].text, /ON CONFLICT \(perdoruesi_id, udhetimi_id\) DO NOTHING/);
+  assert.match(queries[2].text, /SELECT[\s\S]*EXISTS[\s\S]*COUNT/);
+  assert.doesNotMatch(queries[1].text, /WITH/);
+});
+
+test('regression: save reads the committed row after the insert statement', async () => {
+  const { ruajPreferencen } = loadPersistence();
+  const sql = async (strings) => {
+    const text = strings.join('?');
+    if (/SELECT id FROM udhetimet/.test(text)) return [{ id: '2' }];
+    if (/INSERT INTO preferencat_udhetimeve/.test(text)) return [];
+    if (/SELECT[\s\S]*EXISTS[\s\S]*COUNT/.test(text)) {
+      return [{ ruajtur: true, numer: 1 }];
+    }
+    throw new Error(`Unexpected query: ${text}`);
+  };
+  const result = await ruajPreferencen('2', '123', sql);
+  assert.deepEqual({ ruajtur: result.ruajtur, numer: result.numer }, { ruajtur: true, numer: 1 });
 });
 
 test('database failure is surfaced without a success result', async () => {

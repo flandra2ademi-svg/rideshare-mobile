@@ -40,39 +40,23 @@ export async function ruajPreferencen(
   perdoruesiId: string,
   sql: PreferencaSql = getSql(),
 ): Promise<GjendjePreferencash> {
-  const rows = await sql`
-    WITH udhetimi_ekziston AS (
-      SELECT id FROM udhetimet WHERE id = ${udhetimiId}
-    ),
-    shtuar AS (
-      INSERT INTO preferencat_udhetimeve (perdoruesi_id, udhetimi_id)
-      SELECT ${perdoruesiId}, id FROM udhetimi_ekziston
-      ON CONFLICT (perdoruesi_id, udhetimi_id) DO NOTHING
-      RETURNING udhetimi_id
-    )
-    SELECT
-      EXISTS (SELECT 1 FROM udhetimi_ekziston) AS udhetimi_ekziston,
-      EXISTS (
-        SELECT 1
-        FROM preferencat_udhetimeve
-        WHERE perdoruesi_id = ${perdoruesiId} AND udhetimi_id = ${udhetimiId}
-      ) AS ruajtur,
-      COUNT(*)::int AS numer
-    FROM preferencat_udhetimeve
-    WHERE udhetimi_id = ${udhetimiId}
+  const udhetimet = await sql`
+    SELECT id FROM udhetimet WHERE id = ${udhetimiId}
   `;
 
-  const row = rows[0] as {
-    udhetimi_ekziston: boolean;
-    ruajtur: boolean;
-    numer: number;
-  } | undefined;
-
-  if (!row?.udhetimi_ekziston) {
+  if (udhetimet.length === 0) {
     throw new Error("UDHETIMI_NUK_EKZISTON");
   }
 
-  return { ruajtur: row.ruajtur === true, numer: Number(row.numer ?? 0) };
+  await sql`
+    INSERT INTO preferencat_udhetimeve (perdoruesi_id, udhetimi_id)
+    VALUES (${perdoruesiId}, ${udhetimiId})
+    ON CONFLICT (perdoruesi_id, udhetimi_id) DO NOTHING
+  `;
+
+  // This is deliberately a new statement: PostgreSQL data-modifying CTEs
+  // use one snapshot, so their main SELECT cannot see the inserted row.
+  return lexoGjendjenEPreferencave(udhetimiId, perdoruesiId, sql);
 }
 
 export async function merrGjendjenEServerit(
