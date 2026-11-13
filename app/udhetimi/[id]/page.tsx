@@ -5,6 +5,8 @@ import { merrProfilin } from "@/lib/profilet";
 import { FormaNdryshoOren } from "@/components/FormaNdryshoOren";
 import { mundTeNdryshoje } from "@/lib/lejet";
 import { Vendtakimi } from "@/components/Vendtakimi";
+import { PreferencaUdhetimi } from "@/components/PreferencaUdhetimi";
+import { merrGjendjenEServerit } from "@/lib/preferencat";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +32,7 @@ export default async function Detajet({ params }: { params: Promise<{ id: string
   // A profile lookup failure must not prevent public trip details from loading.
   const profili = await merrProfilin().catch(() => null);
   const lejohet = mundTeNdryshoje(profili, udhetim);
+  const preferenca = await merrGjendjenEServerit(id).catch(() => null);
 
   return (
     <main>
@@ -42,6 +45,7 @@ export default async function Detajet({ params }: { params: Promise<{ id: string
         <p><strong>Vende të lira</strong><span>{udhetim.vende}</span></p>
       </section>
       <Vendtakimi />
+      {preferenca && <PreferencaUdhetimi udhetimiId={id} fillestare={preferenca} />}
       {lejohet && (
         <section aria-label="Ndrysho orën">
           <h2>Ndrysho orën e udhëtimit tim</h2>
