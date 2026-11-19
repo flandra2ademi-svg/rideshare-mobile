@@ -7,6 +7,8 @@ import { mundTeNdryshoje } from "@/lib/lejet";
 import { Vendtakimi } from "@/components/Vendtakimi";
 import { PreferencaUdhetimi } from "@/components/PreferencaUdhetimi";
 import { merrGjendjenEServerit } from "@/lib/preferencat";
+import { lexoGjendjenKerkesave } from "@/lib/kerkesa";
+import { KerkesaLive } from "@/components/KerkesaLive";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +35,7 @@ export default async function Detajet({ params }: { params: Promise<{ id: string
   const profili = await merrProfilin().catch(() => null);
   const lejohet = mundTeNdryshoje(profili, udhetim);
   const preferenca = await merrGjendjenEServerit(id).catch(() => null);
+  const gjendjeKerkesash = profili ? await lexoGjendjenKerkesave(id, profili.id).catch(() => null) : null;
 
   return (
     <main>
@@ -46,17 +49,18 @@ export default async function Detajet({ params }: { params: Promise<{ id: string
       </section>
       <Vendtakimi />
       {preferenca && <PreferencaUdhetimi udhetimiId={id} fillestare={preferenca} />}
+      {gjendjeKerkesash && <KerkesaLive udhetimiId={id} fillestare={gjendjeKerkesash} />}
       {lejohet && (
         <section aria-label="Ndrysho orën">
           <h2>Ndrysho orën e udhëtimit tim</h2>
           <FormaNdryshoOren id={id} ora={udhetim.ora} />
         </section>
       )}
-      {udhetim.vende > 0 ? (
+      {!gjendjeKerkesash && udhetim.vende > 0 ? (
         <Link className="action action--wide" href={`/udhetimi/${id}/kerkesa`}>Kërko vend</Link>
-      ) : (
+      ) : !gjendjeKerkesash ? (
         <button className="action action--wide" disabled>Nuk ka vende të lira</button>
-      )}
+      ) : null}
     </main>
   );
 }

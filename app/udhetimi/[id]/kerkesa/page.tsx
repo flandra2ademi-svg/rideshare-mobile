@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { gjejUdhetimin } from "@/lib/udhetimet";
+import { merrProfilin } from "@/lib/profilet";
+import { lexoGjendjenKerkesave } from "@/lib/kerkesa";
+import { KerkesaLive } from "@/components/KerkesaLive";
 
 export const dynamic = "force-dynamic";
 
@@ -23,20 +26,13 @@ export default async function Kerkesa({ params }: { params: Promise<{ id: string
 
   if (!udhetim) notFound();
 
+  const profili = await merrProfilin().catch(() => null);
+  const state = profili ? await lexoGjendjenKerkesave(id, profili.id).catch(() => null) : null;
+
   return (
     <main>
       <Link className="back-link" href={`/udhetimi/${id}`}>← Kthehu te detajet</Link>
-      {udhetim.vende > 0 ? (
-        <section className="status-card" aria-live="polite">
-          <p className="status-icon" aria-hidden="true">◷</p>
-          <p className="eyebrow">Kërkesa për vend</p>
-          <h1>Simulim: Në pritje</h1>
-          <p>Kërkesa për udhëtimin nga {udhetim.nisja} nuk është dërguar te shoferi.</p>
-          <p>Ruajtjen dhe konfirmimin real do t’i shtojmë më vonë.</p>
-        </section>
-      ) : (
-        <section className="status-card"><h1>Nuk ka vende të lira.</h1><p>Ky udhëtim nuk pranon kërkesa të reja.</p></section>
-      )}
+      {state ? <KerkesaLive udhetimiId={id} fillestare={state} /> : <section className="status-card"><h1>Ky veprim kërkon hyrje.</h1><p>Kyçju me GitHub për të dërguar ose menaxhuar kërkesën.</p></section>}
     </main>
   );
 }

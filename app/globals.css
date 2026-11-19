@@ -93,6 +93,13 @@ p { line-height: 1.55; }
 .favorite-button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .favorite-status, .favorite-count { min-height: 1.55em; margin: 0; color: var(--muted); }
 .favorite-status { color: #a7f1d9; font-weight: 700; }
+.request-card { display: grid; gap: 14px; margin: 28px 0; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.request-summary { margin: 0; background: var(--background); }
+.request-warning, .request-error { margin: 0; color: #ffd18c; font-weight: 700; }
+.request-error { color: #ffc2cf; }
+.request-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.request-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
+.request-list .action { margin: 0; }
 
 @media (min-width: 600px) {
   main { padding: 56px 32px; }
