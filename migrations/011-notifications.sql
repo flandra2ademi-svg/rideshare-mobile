@@ -76,7 +76,8 @@ BEGIN
 
   INSERT INTO njoftimet (perdoruesi_id, kerkesa_id, lloji)
   VALUES (k.udhetari_id, k.id, 'accepted')
-  ON CONFLICT (kerkesa_id, lloji) DO NOTHING;
+  ON CONFLICT ON CONSTRAINT njoftim_kerkesa_lloj_unique
+  DO NOTHING;
 
   RETURN QUERY SELECT k.id, u.id, u.vende - 1, 'accepted'::TEXT;
 END;

@@ -24,7 +24,8 @@ test('acceptance and notification insert are one locked, idempotent PostgreSQL f
   assert.match(migration, /FOR UPDATE/);
   assert.match(migration, /IF k\.status = 'accepted'/);
   assert.match(migration, /UPDATE udhetimet AS ud\s+SET vende = ud\.vende - 1/);
-  assert.match(migration, /INSERT INTO njoftimet \(perdoruesi_id, kerkesa_id, lloji\)\s+VALUES \(k\.udhetari_id, k\.id, 'accepted'\)\s+ON CONFLICT \(kerkesa_id, lloji\) DO NOTHING/s);
+  assert.match(migration, /INSERT INTO njoftimet \(perdoruesi_id, kerkesa_id, lloji\)\s+VALUES \(k\.udhetari_id, k\.id, 'accepted'\)\s+ON CONFLICT ON CONSTRAINT njoftim_kerkesa_lloj_unique\s+DO NOTHING/s);
+  assert.doesNotMatch(migration, /ON CONFLICT\s*\(\s*kerkesa_id\s*,\s*lloji\s*\)/);
   assert.ok(migration.indexOf('UPDATE kerkesa_udhetimeve') < migration.indexOf('UPDATE udhetimet AS ud'));
   assert.ok(migration.indexOf('UPDATE udhetimet AS ud') < migration.indexOf('INSERT INTO njoftimet'));
   assert.doesNotMatch(migration, /UPDATE udhetimet\s+SET vende = vende - 1/);

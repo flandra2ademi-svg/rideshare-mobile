@@ -8,20 +8,20 @@ Pranimi dhe krijimi i njoftimit ndodhin brenda të njëjtit funksion PostgreSQL,
 
 ## Përgatitja
 
-U ruajtën funksionalitetet e Java 10 dhe u shtua migrimi 011 pas `migrations/010-live-ride-requests.sql`. Për testim automatik u përdorën skedarë burimorë dhe mock-e të izoluara, pa ndryshuar të dhënat ekzistuese në Neon. Nuk u përdorën ID reale ose të dhëna personale në këtë raport.
+U ruajtën funksionalitetet e Java 10 dhe u shtua migrimi 011 pas `migrations/010-live-ride-requests.sql`. Gjatë provës reale u gjet gabimi PostgreSQL `column reference "kerkesa_id" is ambiguous` (SQLSTATE 42702), sepse output parameter-i `kerkesa_id` përplasej me `ON CONFLICT (kerkesa_id, lloji)`. U korrigjua me `ON CONFLICT ON CONSTRAINT njoftim_kerkesa_lloj_unique DO NOTHING` dhe korrigjimi u aplikua me sukses në Neon përmes `CREATE OR REPLACE FUNCTION`. Testet automatike kontrollojnë që forma ambigue të mos rikthehet.
 
 ### Prova 1: Rasti 1 · Përgjigjja bëhet njoftim
 
-- Hapat dhe përgjigjja e shoferit: U kontrollua rrjedha ekzistuese e pranimit dhe funksioni i ri që përditëson kërkesën, ul vendet dhe fut njoftimin në të njëjtën thirrje SQL.
+- Hapat dhe përgjigjja e shoferit: Në dy sesione të autentikuara browser-i u përdor Ride ID `11` me Request ID `5`. Pasagjeri krijoi kërkesën dhe shoferi e pranoi.
 - Çfarë prisja te udhëtari: Një njoftim i palexuar që thotë se shoferi e pranoi kërkesën dhe që lidhet me kërkesën e saktë.
-- ID-ja e njoftimit, numri i palexuar dhe çfarë pashë realisht: Në testet automatike u verifikuan fushat, marrësi nga `k.udhetari_id`, kufizimi unik dhe numërimi i `lexuar_me IS NULL`. Nuk u krye një provë browser-i me Neon për Java 11, prandaj nuk po deklaroj ID ose numër real.
-- Cila kërkesë u hap dhe çfarë mbeti pas Refresh: Rruga e detajit përdor ID-në e ruajtur të njoftimit dhe kërkesës; kjo u kontrollua me test burimor. Vëzhgim real pas Refresh nuk u krye.
+- ID-ja e njoftimit, numri i palexuar dhe çfarë pashë realisht: U krijua saktësisht një njoftim me Notification ID `3`, me recipient passenger `361524593` dhe type `accepted`. Pasagjeri pa `1` njoftim të palexuar. Këto u verifikuan në Neon PostgreSQL dhe në aplikacion.
+- Cila kërkesë u hap dhe çfarë mbeti pas Refresh: Njoftimi lidhej me Request ID `5`; statusi u bë `accepted` dhe vendet ndryshuan nga `2` në `1`. Njoftimi mbeti në listë pas leximit.
 
 ### Prova 2: Rasti 2 · Hapja dhe shënimi si i lexuar
 
-- ID-ja e njoftimit dhe cila kërkesë u hap realisht: Testi verifikon se detaji hapet vetëm nga ID-ja e njoftimit të autorizuar dhe se shfaq `kerkesaId`/`udhetimiId`. Nuk u përdor ID reale.
-- Numri i palexuar para/pas konfirmimit nga serveri: API-ja e ul gjendjen vetëm me `PATCH` të autorizuar dhe me `COALESCE(lexuar_me, NOW())`; testet kontrollojnë idempotency. Prova browser-i nuk u krye.
-- Çfarë mbeti në histori pas kthimit te lista dhe Refresh: Implementimi nuk e fshin rreshtin; lista dhe numërimi lexohen nga serveri. Kjo u verifikua me teste burimore, jo me browser real.
+- ID-ja e njoftimit dhe cila kërkesë u hap realisht: Pasagjeri hapi Notification ID `3`, i cili hapi kërkesën e saktë Request ID `5`.
+- Numri i palexuar para/pas konfirmimit nga serveri: Numri ndryshoi nga `1` në `0`. Serveri konfirmoi se Notification ID `3` u shënua si i lexuar.
+- Çfarë mbeti në histori pas kthimit te lista dhe Refresh: Njoftimi mbeti në listë pas leximit dhe nuk ndryshoi statusin e kërkesës ose numrin e vendeve.
 - Nëse provova dështimin e shënimit: Nuk e provova këtë skenar shtesë. UI-ja ruan njoftimin si të palexuar dhe shfaq gabim me mundësi riprovimi.
 
 ### Prova 3: Rasti 3 · Rilidhja pa njoftime të dyfishta
@@ -46,7 +46,7 @@ Prova me një hyrje tjetër nuk u krye për Java 11. Autorizimi u kontrollua me 
 
 Statusi i kërkesës dhe leximi i njoftimit janë gjendje të ndryshme: kërkesa mund të jetë `accepted` ndërsa njoftimi është ende i palexuar. Hapja e njoftimit nuk ndryshon vendet ose statusin e kërkesës.
 
-Mbeten të paverifikuara me mjedis real: provat browser-i për tre skenarët, concurrency real kundër PostgreSQL dhe aplikimi i këtij migrimi në Neon. Nuk u ekzekutua backfill për kërkesat e vjetra.
+Mbeten të paverifikuara me mjedis real: offline/reconnect dhe concurrency real kundër PostgreSQL. Këto nuk po deklarohen si të kryera. Korrigjimi i funksionit u aplikua në Neon; nuk u rikrijuan ride/request fixtures dhe nuk u modifikuan kërkesat e pranuara më parë. Nuk u ekzekutua backfill për kërkesat e vjetra.
 
 ## Zgjerime opsionale
 
@@ -54,7 +54,7 @@ Web Push dhe refuzimi i kërkesës nuk u implementuan, sepse janë opsionale në
 
 ## Ndihma nga AI (Artificial Intelligence — inteligjencë artificiale)
 
-Codex ndihmoi me inspektimin e udhëzimeve, dizajnin e migrimit PostgreSQL, implementimin Next.js/TypeScript, kontrollet e autorizimit, testet dhe raportin. Nuk po paraqes si të kryera prova browser-i ose rezultate Neon që nuk u ekzekutuan realisht.
+Codex ndihmoi me inspektimin e udhëzimeve, dizajnin e migrimit PostgreSQL, implementimin Next.js/TypeScript, korrigjimin e regresionit SQL, kontrollet e autorizimit, testet dhe raportin. Rezultatet e Ride 11 të dokumentuara këtu u verifikuan me Neon PostgreSQL dhe dy sesione reale browser-i. Offline/reconnect dhe concurrency nuk po deklarohen si të kryera.
 
 ## Pas dorëzimit të parë — përditëso më vonë
 
