@@ -34,6 +34,12 @@ test('acceptance is server-authorized and idempotent', () => {
   assert.match(migration, /RETURN QUERY SELECT k\.id/);
 });
 
+test('regression: PostgreSQL return-column ambiguity is eliminated in the seat update', () => {
+  assert.match(migration, /UPDATE udhetimet AS ud\s+SET vende = ud\.vende - 1\s+WHERE ud\.id = u\.id/);
+  assert.doesNotMatch(migration, /UPDATE udhetimet\s+SET vende = vende - 1/);
+  assert.match(migration, /RETURNS TABLE \(kerkesa_id BIGINT, udhetimi_id TEXT, vende INTEGER, status TEXT\)/);
+});
+
 test('polling is single-flight, abortable, stale-safe, and cleaned up', () => {
   assert.match(component, /setTimeout\(loop, 5000\)/);
   assert.match(component, /AbortController/);

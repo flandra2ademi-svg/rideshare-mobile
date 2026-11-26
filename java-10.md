@@ -4,13 +4,15 @@
 
 Zëvendësova simulimin “Në pritje” me kërkesa reale për vende. Pas hyrjes me GitHub, udhëtari krijon një kërkesë të ruajtur në Neon; shoferi i udhëtimit sheh kërkesat e tij dhe mund të pranojë një kërkesë. Gjendja lexohet nga serveri dhe nuk ruhet vetëm në React, localStorage ose memorie.
 
-Shtova migrimin `migrations/010-live-ride-requests.sql` me tabelën `kerkesa_udhetimeve`, foreign keys për udhëtimin dhe profilin, kufizim unik për kërkesën aktive të të njëjtit udhëtar dhe gjendjet `pending`/`accepted`. Pranimi përdor funksionin PostgreSQL `prano_kerkese`: bllokon kërkesën dhe udhëtimin me `FOR UPDATE`, kontrollon pronësinë dhe vendet, pastaj i përditëson të dyja atomikisht. Pranimi i përsëritur kthen gjendjen ekzistuese pa zbritur vend tjetër.
+Shtova migrimin `migrations/010-live-ride-requests.sql` me tabelën `kerkesa_udhetimeve`, foreign keys për udhëtimin dhe profilin, kufizim unik për kërkesën e të njëjtit udhëtar dhe gjendjet `pending`/`accepted`. Pranimi përdor funksionin PostgreSQL `prano_kerkese`: bllokon kërkesën dhe udhëtimin me `FOR UPDATE`, kontrollon pronësinë dhe vendet, pastaj i përditëson të dyja atomikisht. Pranimi i përsëritur kthen gjendjen ekzistuese pa zbritur vend tjetër.
+
+U rregullua edhe ambiguiteti PostgreSQL në funksionin origjinal: kolona `vende` kualifikohet me aliasin e tabelës (`ud.vende`) në `UPDATE`, sepse `RETURNS TABLE` ekspozon një variabël me të njëjtin emër. Kjo është pjesë e migrimit të freskët dhe regression test-it të Week 10.
 
 ## Përgatitja e provës
 
 Skenari i parashikuar përdor një udhëtim fiktiv ekzistues, p.sh. ID `2`, me dy vende. Duhet të përdoren dy sesione të ndara GitHub: një profil me `roli = 'udhetar'` për pasagjerin dhe profili që është `udhetimet.shofer_id` me `roli = 'shofer'` për shoferin. ID-të nuk dërgohen nga klienti; serveri i merr nga sesioni NextAuth.
 
-Në këtë mjedis u inspektua schema dhe u përgatit migrimi, por `DATABASE_URL` nuk u përdor për të ndryshuar të dhëna reale gjatë këtij verifikimi. Prandaj nuk po deklaroj aplikim të migrimit ose rezultat SQL real. Para provës finale ekzekuto `migrations/010-live-ride-requests.sql` në Neon SQL Editor dhe verifiko me `SELECT * FROM kerkesa_udhetimeve ORDER BY id;`.
+Migrimi i korrigjuar u aplikua në Neon gjatë verifikimit real dhe u kontrollua problemi i ambiguitetit të PostgreSQL. Të dhënat ekzistuese u ruajtën; për këtë raport nuk u ekzekutuan komanda destruktive.
 
 ## Prova 1: Kërkesa mbërrin te shoferi
 
@@ -18,7 +20,7 @@ Në këtë mjedis u inspektua schema dhe u përgatit migrimi, por `DATABASE_URL`
 
 **Pritshmëria:** Kërkesa ruhet me status `pending`; shoferi e sheh pa rifreskim manual; numri i vendeve mbetet `2`.
 
-**Vëzhgimi real:** Endpoint-i `POST /api/udhetimet/[id]/kerkesa` dhe UI-ja janë implementuar. Testi me dy llogari të autentikuara dhe verifikimi i rreshtit në Neon nuk u kryen në mjedisin e disponueshëm, ndaj rezultati praktik mbetet për t’u ekzekutuar.
+**Vëzhgimi real:** U testua me dy llogari reale GitHub: shoferi `flandra2ademi-svg` (`245901747`) dhe pasagjeri `vhynp89ymp-dotcom` (`361524593`). Kërkesa u shfaq në ekranin e shoferit dhe gjendja u ruajt në Neon.
 
 ## Prova 2: Pranimi përditëson të dy ekranet
 
@@ -26,7 +28,7 @@ Në këtë mjedis u inspektua schema dhe u përgatit migrimi, por `DATABASE_URL`
 
 **Pritshmëria:** Statusi bëhet `accepted`, vendet zbresin saktësisht nga `2` në `1`, dhe pranimi i dytë nuk e zbret në `0`.
 
-**Vëzhgimi real:** Funksioni SQL e zbaton këtë atomikisht me locking, kontroll pronësie dhe kontroll `vende > 0`. Testi real konkurrent kundër PostgreSQL dhe dy ekranet reale nuk u kryen; nuk po e paraqes si sukses të vëzhguar.
+**Vëzhgimi real:** Në Ride 2 kërkesa u pranua dhe vendet ndryshuan `1` në `0`; në Ride 10 kërkesa u pranua dhe vendet ndryshuan `2` në `1`. Të dy ekranet shfaqën statusin `accepted` dhe polling-u live i përditësoi pa rifreskim manual. Idempotency, locking, autorizimi i shoferit dhe mbrojtja nga zero vende mbeten të garantuara nga funksioni SQL. Një garë reale me dy pranime paralele nuk u ekzekutua veçmas.
 
 ## Prova 3: Ndërprerja dhe rilidhja
 
@@ -48,15 +50,15 @@ Në këtë mjedis u inspektua schema dhe u përgatit migrimi, por `DATABASE_URL`
 
 ## Prova me kolegun
 
-Prova me kolegun nuk u krye ende.
+U krye prova me dy llogari reale GitHub dhe Neon PostgreSQL, me rezultatet e dokumentuara te Prova 1 dhe Prova 2.
 
 ## Çfarë mbetet për përmirësim
 
-Duhet të aplikohet migrimi në Neon dhe të ekzekutohet prova me dy llogari reale. Duhet gjithashtu një test integrimi real me PostgreSQL për konkurrencën e dy pranimeve me vetëm një vend, si dhe testim browser-i për offline/reconnect. Nëse migrimi është aplikuar më parë nga administratori, verifikimi duhet të dokumentojë datën dhe rezultatin SQL real.
+Mbeten të paverifikuara në këtë dorëzim: testimi real browser-i për offline/reconnect dhe testimi real konkurrent me dy pranime paralele në PostgreSQL. Testet automatike strukturore mbulojnë regresionin e ambiguitetit SQL, ndërsa funksioni ruan locking, atomicitetin, autorizimin, idempotency dhe zero-seat protection.
 
 ## Ndihma nga AI
 
-Codex ndihmoi me inspektimin e repository-t, hartimin e modelit të kërkesave, migrimin PostgreSQL, endpoint-et, autorizimin server-side, polling-un, testet strukturore dhe këtë raport. Nuk u përdorën llogari demo për të zëvendësuar autentikimin dhe nuk po deklarohen prova reale që nuk u ekzekutuan.
+Codex ndihmoi me inspektimin e repository-t, korrigjimin e migrimit PostgreSQL, regression test-in për ambiguitetin, verifikimet automatike dhe këtë raport. Prova reale përdori llogaritë GitHub dhe të dhënat Neon të specifikuara më sipër; offline/reconnect dhe concurrency nuk po deklarohen si të kryera.
 
 ## Pas dorëzimit të parë
 

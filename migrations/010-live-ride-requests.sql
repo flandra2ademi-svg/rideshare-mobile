@@ -49,7 +49,11 @@ BEGIN
   UPDATE kerkesa_udhetimeve
   SET status = 'accepted', pranuar_me = NOW()
   WHERE id = k.id;
-  UPDATE udhetimet SET vende = vende - 1 WHERE id = u.id;
+  -- Qualify both sides: RETURNS TABLE exposes a PL/pgSQL variable named
+  -- `vende`, so an unqualified `vende = vende - 1` is ambiguous.
+  UPDATE udhetimet AS ud
+  SET vende = ud.vende - 1
+  WHERE ud.id = u.id;
 
   RETURN QUERY SELECT k.id, u.id, u.vende - 1, 'accepted'::TEXT;
 END;
